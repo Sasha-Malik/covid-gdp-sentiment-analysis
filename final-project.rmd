@@ -139,6 +139,12 @@ names(avg_data_2020)[names(avg_data_2020) == "2020 [YR2020]"] <- "gdp_2020_value
 df2<-avg_data_2020[!(avg_data_2020$gdp_2020_values==".."),]
 view(df2)
 
+df3$gdp_2020_values <- as.numeric(as.character(df3$gdp_2020_values))
+view(df3)
+
+df3$gdp_2020_values =  (df3$gdp_2020_values) / 1000000000
+
+
 df3<-df2 %>% filter(!is.na(df2$gdp_2020_values))
 View(df3)
 
