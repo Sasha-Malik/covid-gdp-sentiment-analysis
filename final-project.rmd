@@ -139,11 +139,14 @@ names(avg_data_2020)[names(avg_data_2020) == "2020 [YR2020]"] <- "gdp_2020_value
 df2<-avg_data_2020[!(avg_data_2020$gdp_2020_values==".."),]
 view(df2)
 
+df3<-df2
+view(df3)
+
 df3$gdp_2020_values <- as.numeric(as.character(df3$gdp_2020_values))
 view(df3)
 
-df3$gdp_2020_values =  (df3$gdp_2020_values) / 1000000000
-
+df3$gdp_2020_values =  (df3$gdp_2020_values) / 100000000
+view(df3)
 
 #df3<-df2 %>% filter(!is.na(df2$gdp_2020_values))
 #View(df3)
@@ -164,7 +167,7 @@ ggplot(data = df3, aes(x = gdp_2020_values , y = avg_score_2020))+
 ```{r regression}
 
 library(brms)
-dv <- brm(formula = gdp_2020_values~avg_score_2020, data=df3, family=gaussian ,refresh=0)
+dv <- brm(formula = avg_score_2020~gdp_2020_values, data=df3, family=gaussian ,refresh=0)
 
 ```
 
@@ -174,15 +177,15 @@ summary(dv)
 
 ```{r plot_uncertainty_coef}
 attach(df3)
-uncertainty_coef<-as_draws_df(dv, variable = "b_avg_score_2020")
-ggplot(uncertainty_coef, aes(x=b_avg_score_2020))+geom_density()+labs(title= "Uncertainty in regression coefficient",
+uncertainty_coef<-as_draws_df(dv, variable = "b_gdp_2020_values")
+ggplot(uncertainty_coef, aes(x=b_gdp_2020_values))+geom_density()+labs(title= "Uncertainty in regression coefficient",
                                                                   x="Regression Coefficient",
                                                                   y="Uncertainty")
 ```
 
 
 ```{r plot_effects}
-conditional_effects(dv,effects="avg_score_2020")
+conditional_effects(dv,effects="gdp_2020_values")
 ```
 
 
