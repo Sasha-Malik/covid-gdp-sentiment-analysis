@@ -53,11 +53,11 @@ avg_data_2020<-data_2020 %>%
     avg_score_2020 = mean(SCORE, na.rm = TRUE)
     )
 
-view(avg_data_2020)
+#view(avg_data_2020)
 
 names(avg_data_2020)[names(avg_data_2020) == "NAME_0"] <- "region"
 
-view(avg_data_2020)
+#view(avg_data_2020)
 ```
 
 ```{r range of scores 2020}
@@ -108,16 +108,16 @@ map2
 ```{r loading gdp data}
 
 gdp_2020 <- read_csv("gdp_2020.csv")
-view(gdp_2020)
+#view(gdp_2020)
 
 gdp_2021 <- read_csv("gdp_2021.csv")
-view(gdp_2021)
+#view(gdp_2021)
 
 gdp_2020 <- gdp_2020[c(1,5)]
-view(gdp_2020)
+#view(gdp_2020)
 
 gdp_2021 <- gdp_2021[c(1,5)]
-view(gdp_2021)
+#view(gdp_2021)
 
 ```
 
@@ -145,8 +145,8 @@ view(df3)
 df3$gdp_2020_values =  (df3$gdp_2020_values) / 1000000000
 
 
-df3<-df2 %>% filter(!is.na(df2$gdp_2020_values))
-View(df3)
+#df3<-df2 %>% filter(!is.na(df2$gdp_2020_values))
+#View(df3)
 
 #sentiment scores
 ggplot(data = df3, aes(x = avg_score_2020)) + 
@@ -168,10 +168,22 @@ dv <- brm(formula = gdp_2020_values~avg_score_2020, data=df3, family=gaussian ,r
 
 ```
 
+```{r sum_model}
+summary(dv)
+```
+
+```{r plot_uncertainty_coef}
+attach(df3)
+uncertainty_coef<-as_draws_df(dv, variable = "b_avg_score_2020")
+ggplot(uncertainty_coef, aes(x=b_avg_score_2020))+geom_density()+labs(title= "Uncertainty in regression coefficient",
+                                                                  x="Regression Coefficient",
+                                                                  y="Uncertainty")
+```
 
 
-
-
+```{r plot_effects}
+conditional_effects(dv,effects="avg_score_2020")
+```
 
 
 
