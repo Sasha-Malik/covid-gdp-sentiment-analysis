@@ -127,9 +127,20 @@ view(gdp_2020)
 
 avg_data_2020 <- left_join(avg_data_2020, gdp_2020, by="region")
 View(avg_data_2020)
+
+names(avg_data_2020)[names(avg_data_2020) == "2020 [YR2020]"] <- "gdp_2020_values"
+
 ```
 
 
+```{r compare_variables}
+ggplot( avg_data_2020, aes(x = gdp_2020_values)) + 
+  geom_histogram()
+
+ggplot(data = avg_data_2020, aes(x = avg_score_2020 , y = gdp_2020_values))+ 
+  geom_point() + 
+  geom_smooth()
+```
 
 
 
