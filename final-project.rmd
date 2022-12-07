@@ -1,0 +1,127 @@
+---
+title: "Final Project"
+date: '2022-11-11'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(ggplot2)
+```
+
+## Introduction
+
+
+
+
+## Load Data
+
+```{r load_data}
+data_2020 <- read.csv("data/sentiment_country_2020.csv")
+data_2021 <- read.csv("data/sentiment_country_2021.csv")
+```
+
+
+```{r viewing scores}
+view(data_2020)
+view(data_2021)
+```
+
+## Visualize Data
+
+
+```{r avg score 2020}
+
+avg_data_2020<-data_2020 %>%
+  group_by(NAME_0) %>%
+  summarize(
+    avg_score_2020 = mean(SCORE, na.rm = TRUE)
+    )
+
+view(avg_data_2020)
+
+names(avg_data_2020)[names(avg_data_2020) == "NAME_0"] <- "region"
+
+view(avg_data_2020)
+```
+
+```{r range of scores 2020}
+ggplot(data = data_2020, aes(x=SCORE)) + 
+  geom_histogram(binwidth = 0.01, fill = "lightblue")+ 
+  ylab("Frequency") + 
+  xlab("sentiment score") +
+  ggtitle("Distribution of Sentiment scores of the tweets")
+```
+
+
+```{r avg scores per country}
+ggplot(data = avg_data_2020, aes(x=region, y=avg_score_2020)) + 
+  geom_bar(stat = "identity")+
+  coord_flip()
+```
+
+
+ 
+```{r world map plot}
+mapdata <- map_data("world") ##ggplot2
+View(mapdata)
+
+mapdata <- left_join(mapdata, avg_data_2020, by="region")
+View(mapdata)
+
+
+mapdata1<-mapdata %>% filter(!is.na(mapdata$avg_score_2020))
+View(mapdata1)
+
+map1<-ggplot(mapdata1, aes( x = long, y = lat, group=group)) +
+  geom_polygon(aes(fill = avg_score_2020), color = "black")
+map1
+
+map2 <- map1 + scale_fill_gradient(name = "avg score", low = "light blue", high =  "black", na.value = "grey50")+
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title.y=element_blank(),
+        axis.title.x=element_blank(),
+        rect = element_blank())
+map2
+```
+
+
+
+
+```{r loading gdp data}
+
+gdp_2020 <- read_csv("gdp_2020.csv")
+view(gdp_2020)
+
+gdp_2021 <- read_csv("gdp_2021.csv")
+view(gdp_2021)
+
+gdp_2020 <- gdp_2020[c(1,5)]
+view(gdp_2020)
+
+gdp_2021 <- gdp_2021[c(1,5)]
+view(gdp_2021)
+
+```
+
+```{r avg sentiments and gdp }
+names(gdp_2020)[names(gdp_2020) == "Country Name"] <- "region"
+view(gdp_2020)
+
+avg_data_2020 <- left_join(avg_data_2020, gdp_2020, by="region")
+View(avg_data_2020)
+```
+
+
+
+
+
+
+
+
+
+
