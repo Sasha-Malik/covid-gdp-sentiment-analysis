@@ -9,6 +9,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
 library(ggplot2)
+library(dplyr)
+library(lubridate)
 ```
 
 ## Introduction
@@ -30,6 +32,17 @@ view(data_2021)
 ```
 
 ## Visualize Data
+
+```{r}
+data_total <- rbind(data_2020,data_2021)
+
+ggplot (data=data_total, aes(DATE, SCORE))+
+  geom_point()
+
+```
+
+
+
 
 
 ```{r avg score 2020}
