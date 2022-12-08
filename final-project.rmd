@@ -37,7 +37,7 @@ view(data_2021)
 data_total <- rbind(data_2020,data_2021)
 
 ggplot (data=data_total, aes(DATE, SCORE))+
-  geom_point()
+  geom_point(alpha = 0.4)
 
 ```
 
@@ -57,7 +57,7 @@ avg_data_2020<-data_2020 %>%
 
 names(avg_data_2020)[names(avg_data_2020) == "NAME_0"] <- "region"
 
-#view(avg_data_2020)
+#view(avg_data_2020_1)
 ```
 
 ```{r range of scores 2020}
@@ -75,18 +75,23 @@ ggplot(data = avg_data_2020, aes(x=region, y=avg_score_2020)) +
   coord_flip()
 ```
 
-
  
 ```{r world map plot}
 mapdata <- map_data("world") ##ggplot2
-View(mapdata)
+#View(mapdata)
+
+#changing USA to United States
+mapdata$region[mapdata$region == "USA"] <- "United States"
+
+#changing UK to United Kingdom
+mapdata$region[mapdata$region == "UK"] <- "United Kingdom"
 
 mapdata <- left_join(mapdata, avg_data_2020, by="region")
-View(mapdata)
+#View(mapdata)
 
 
 mapdata1<-mapdata %>% filter(!is.na(mapdata$avg_score_2020))
-View(mapdata1)
+#View(mapdata1)
 
 map1<-ggplot(mapdata1, aes( x = long, y = lat, group=group)) +
   geom_polygon(aes(fill = avg_score_2020), color = "black")
@@ -123,60 +128,124 @@ gdp_2021 <- gdp_2021[c(1,5)]
 
 ```{r avg sentiments and gdp }
 names(gdp_2020)[names(gdp_2020) == "Country Name"] <- "region"
-view(gdp_2020)
+#view(gdp_2020)
 
 avg_data_2020 <- left_join(avg_data_2020, gdp_2020, by="region")
-View(avg_data_2020)
+#View(avg_data_2020)
+
+#only for daily data
+
+names(data_2020)[names(data_2020) == "NAME_0"] <- "region"
+view(data_2020)
+
+daily_data_2020  <- left_join(data_2020, gdp_2020, by="region")
+names(daily_data_2020)[names(daily_data_2020) == "2020 [YR2020]"] <- "gdp_2020_values"
+
+
 
 names(avg_data_2020)[names(avg_data_2020) == "2020 [YR2020]"] <- "gdp_2020_values"
 
 ```
 
 
-```{r compare_variables 2020}
+```{r compare_variables 2020 AVERAGE}
 
 #removing missing values
-df2<-avg_data_2020[!(avg_data_2020$gdp_2020_values==".."),]
-view(df2)
+avg_data_2020<-avg_data_2020[!(avg_data_2020$gdp_2020_values==".."),]
+#view(df2)
 
-df3<-df2
-view(df3)
 
-df3$gdp_2020_values <- as.numeric(as.character(df3$gdp_2020_values))
-view(df3)
+avg_data_2020$gdp_2020_values <- as.numeric(as.character(avg_data_2020$gdp_2020_values))
+#view(df3)
 
-df3$gdp_2020_values =  (df3$gdp_2020_values) / 1000000000
-view(df3)
+avg_data_2020$gdp_2020_values =  (avg_data_2020$gdp_2020_values) / 1000000000
+#view(df3)
 
 #df3<-df2 %>% filter(!is.na(df2$gdp_2020_values))
 #View(df3)
 
 #sentiment scores
-ggplot(data = df3, aes(x = avg_score_2020)) + 
+ggplot(data = avg_data_2020, aes(x = avg_score_2020)) + 
   geom_histogram()
 
 #gdp values
-ggplot(df3, aes(x = region, y = gdp_2020_values )) +  
+ggplot(avg_data_2020, aes(x = region, y = gdp_2020_values )) +  
   geom_bar(stat = "identity")
 
 #comparing both the variables
-ggplot(data = df3, aes(x = gdp_2020_values , y = avg_score_2020))+ 
+ggplot(data = avg_data_2020, aes(x = gdp_2020_values , y = avg_score_2020))+ 
   geom_point() + 
   geom_smooth()
 ```
-```{r regression}
+```{r compare_variables 2020 DAILY}
+
+#removing missing values
+daily_data_2020<-daily_data_2020[!(daily_data_2020$gdp_2020_values==".."),]
+#view(df2)
+
+
+daily_data_2020$gdp_2020_values <- as.numeric(as.character(daily_data_2020$gdp_2020_values))
+#view(df3)
+
+daily_data_2020$gdp_2020_values =  (daily_data_2020$gdp_2020_values) / 10000000000000
+#view(df3)
+
+daily_data_2020<-daily_data_2020 %>% filter(!is.na(daily_data_2020$gdp_2020_values))
+#View(df3)
+
+view(daily_data_2020)
+
+#sentiment scores
+ggplot(data = daily_data_2020, aes(x = avg_score_2020)) + 
+  geom_histogram()
+
+#gdp values
+ggplot(adaily_data_2020, aes(x = region, y = gdp_2020_values )) +  
+  geom_bar(stat = "identity")
+
+#comparing both the variables
+ggplot(data = daily_data_2020, aes(x = gdp_2020_values , y = SCORE))+ 
+  geom_point() + 
+  geom_smooth()
+```
+```{r regression1 DAILY}
 
 library(brms)
-dv <- brm(formula = avg_score_2020~gdp_2020_values, data=df3, family=gaussian ,refresh=0)
+dv <- brm(formula = SCORE~gdp_2020_values, data=daily_data_2020, family=gaussian ,refresh=0)
 
 ```
 
-```{r sum_model}
+```{r sum_model1 DAILY}
 summary(dv)
 ```
 
-```{r plot_uncertainty_coef}
-attach(df3)
+```{r plot_uncertainty_coef1 DAILY}
+attach(daily_data_2020)
+uncertainty_coef<-as_draws_df(dv, variable = "b_gdp_2020_values")
+ggplot(uncertainty_coef, aes(x=b_gdp_2020_values))+geom_density()+labs(title= "Uncertainty in regression coefficient",
+                                                                  x="Regression Coefficient",
+                                                                  y="Uncertainty")
+```
+
+```{r plot_effects1 DAILY}
+conditional_effects(dv,effects="gdp_2020_values")
+```
+
+
+
+```{r regression1}
+
+library(brms)
+dv <- brm(formula = avg_score_2020~gdp_2020_values, data=avg_data_2020, family=gaussian ,refresh=0)
+
+```
+
+```{r sum_model1}
+summary(dv)
+```
+
+```{r plot_uncertainty_coef1}
+attach(avg_data_2020)
 uncertainty_coef<-as_draws_df(dv, variable = "b_gdp_2020_values")
 ggplot(uncertainty_coef, aes(x=b_gdp_2020_values))+geom_density()+labs(title= "Uncertainty in regression coefficient",
                                                                   x="Regression Coefficient",
@@ -184,7 +253,7 @@ ggplot(uncertainty_coef, aes(x=b_gdp_2020_values))+geom_density()+labs(title= "U
 ```
 
 
-```{r plot_effects}
+```{r plot_effects1}
 conditional_effects(dv,effects="gdp_2020_values")
 ```
 
@@ -197,13 +266,13 @@ internet_2020 <- internet_2020[c(2,3)]
 internet_2020<-internet_2020 %>% filter(!is.na(internet_2020$X.1))
 
 internet_2020<-internet_2020 %>%  filter(!row_number() %in% c(1, 2, 3, 4))
-view(internet_2020)
+#view(internet_2020)
 
 names(internet_2020)[names(internet_2020) == "X.1"] <- "region"
 names(internet_2020)[names(internet_2020) == "X.2"] <- "users"
 
-df4<-left_join(internet_2020, df3, by="region")
-view(df4)
+df4<-left_join(internet_2020, avg_data_2020, by="region")
+#view(df4)
 
 df4<-df4 %>% filter(!is.na(df4$avg_score_2020))
 
@@ -214,28 +283,28 @@ ggplot(data = df4, aes(x = users , y = avg_score_2020))+
   geom_smooth()
 
 ```
-```{r regression}
+```{r regression2}
 
 library(brms)
-dv <- brm(formula = avg_score_2020~gdp_2020_values + users, data=df4, family=gaussian ,refresh=0)
+dv <- brm(formula = avg_score_2020~ users, data=df4, family=gaussian ,refresh=0)
 
 ```
 
-```{r plot_reg_coefs}
+```{r plot_reg_coefs2}
 draws_fit <- as_draws_df(dv)
 posterior::summarize_draws(draws_fit)
 ```
 
-```{r cond_eff_coefs}
+```{r cond_eff_coefs2}
 conditional_effects(dv)
 ```
-```{r}
+```{r regression3}
 dv <- brm(formula = avg_score_2020~gdp_2020_values * users, data=df4, family=gaussian ,refresh=0)
 ```
-```{r plot_reg_coefs}
+```{r plot_reg_coefs3}
 draws_fit <- as_draws_df(dv)
 posterior::summarize_draws(draws_fit)
 ```
-```{r cond_eff_coefs}
+```{r cond_eff_coefs3}
 conditional_effects(dv)
 ```
