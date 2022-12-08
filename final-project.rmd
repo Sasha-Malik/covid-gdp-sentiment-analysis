@@ -145,7 +145,7 @@ view(df3)
 df3$gdp_2020_values <- as.numeric(as.character(df3$gdp_2020_values))
 view(df3)
 
-df3$gdp_2020_values =  (df3$gdp_2020_values) / 100000000
+df3$gdp_2020_values =  (df3$gdp_2020_values) / 1000000000
 view(df3)
 
 #df3<-df2 %>% filter(!is.na(df2$gdp_2020_values))
@@ -189,4 +189,53 @@ conditional_effects(dv,effects="gdp_2020_values")
 ```
 
 
+```{r}
+internet_2020 <- read.csv("internet_2020.csv")
 
+internet_2020 <- internet_2020[c(2,3)]
+
+internet_2020<-internet_2020 %>% filter(!is.na(internet_2020$X.1))
+
+internet_2020<-internet_2020 %>%  filter(!row_number() %in% c(1, 2, 3, 4))
+view(internet_2020)
+
+names(internet_2020)[names(internet_2020) == "X.1"] <- "region"
+names(internet_2020)[names(internet_2020) == "X.2"] <- "users"
+
+df4<-left_join(internet_2020, df3, by="region")
+view(df4)
+
+df4<-df4 %>% filter(!is.na(df4$avg_score_2020))
+
+df4$users <- as.numeric(as.character(df4$users))
+
+ggplot(data = df4, aes(x = users , y = avg_score_2020))+ 
+  geom_point() + 
+  geom_smooth()
+
+```
+```{r regression}
+
+library(brms)
+dv <- brm(formula = avg_score_2020~gdp_2020_values + users, data=df4, family=gaussian ,refresh=0)
+
+```
+
+```{r plot_reg_coefs}
+draws_fit <- as_draws_df(dv)
+posterior::summarize_draws(draws_fit)
+```
+
+```{r cond_eff_coefs}
+conditional_effects(dv)
+```
+```{r}
+dv <- brm(formula = avg_score_2020~gdp_2020_values * users, data=df4, family=gaussian ,refresh=0)
+```
+```{r plot_reg_coefs}
+draws_fit <- as_draws_df(dv)
+posterior::summarize_draws(draws_fit)
+```
+```{r cond_eff_coefs}
+conditional_effects(dv)
+```
