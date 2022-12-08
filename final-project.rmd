@@ -34,14 +34,46 @@ view(data_2021)
 ## Visualize Data
 
 ```{r}
-data_total <- rbind(data_2020,data_2021)
 
-ggplot (data=data_total, aes(DATE, SCORE))+
-  geom_point(alpha = 0.4)
+data_2020$DATE=as.Date(data_2020$DATE)
+
+data_2020$Month <- months(data_2020$DATE)
+data_2020$Year <- format(data_2020$DATE,format="%y")
+
+monthly=data_2020 %>% 
+  group_by(Month) %>% 
+  summarise_at(vars(SCORE),
+               list(Score=mean))
+
+monthly$Month=factor(monthly$Month, levels = month.name)
+
+ggplot (data=monthly, aes(Month, Score, group=1))+
+  geom_point()+geom_line(color="blue")
+
+
 
 ```
 
+```{r}
 
+data_2021$DATE=as.Date(data_2021$DATE)
+
+data_2021$Month <- months(data_2021$DATE)
+data_2021$Year <- format(data_2021$DATE,format="%y")
+
+monthly=data_2021 %>% 
+  group_by(Month) %>% 
+  summarise_at(vars(SCORE),
+               list(Score=mean))
+
+monthly$Month=factor(monthly$Month, levels = month.name)
+
+ggplot (data=monthly, aes(Month, y=Score, group=1))+
+  geom_point()+geom_line(color="blue")
+
+
+
+```
 
 
 
@@ -185,9 +217,15 @@ ggplot(avg_data_2020, aes(x = region, y = gdp_2020_values )) +
   geom_bar(stat = "identity")
 
 #comparing both the variables
-ggplot(data = avg_data_2020, aes(x = gdp_2020_values , y = avg_score_2020))+ 
+lgdp=log(gdp_2020_values)
+ggplot(data = avg_data_2020, aes(x = lgdp , y = avg_score_2020))+ 
   geom_point() + 
-  geom_smooth()
+  geom_smooth(method = "lm")
+
+attach(avg_data_2020)
+m1=lm(avg_score_2020~gdp_2020_values)
+summary(m1)
+avg_data_2020
 ```
 ```{r compare_variables 2020 DAILY}
 
