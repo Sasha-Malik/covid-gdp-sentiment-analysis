@@ -53,10 +53,14 @@ avg_data_2020<-data_2020 %>%
     avg_score_2020 = mean(SCORE, na.rm = TRUE)
     )
 
-#view(avg_data_2020)
+avg_data_2021<-data_2021 %>%
+  group_by(NAME_0) %>%
+  summarize(
+    avg_score_2021 = mean(SCORE, na.rm = TRUE)
+    )
 
 names(avg_data_2020)[names(avg_data_2020) == "NAME_0"] <- "region"
-
+names(avg_data_2021)[names(avg_data_2021) == "NAME_0"] <- "region"
 #view(avg_data_2020_1)
 ```
 
@@ -66,16 +70,14 @@ ggplot(data = data_2020, aes(x=SCORE)) +
   ylab("Frequency") + 
   xlab("sentiment score") +
   ggtitle("Distribution of Sentiment scores of the tweets")
+
+ggplot(data = data_2021, aes(x=SCORE)) + 
+  geom_histogram(binwidth = 0.01, fill = "lightblue")+ 
+  ylab("Frequency") + 
+  xlab("sentiment score") +
+  ggtitle("Distribution of Sentiment scores of the tweets")
 ```
 
-
-```{r avg scores per country}
-ggplot(data = avg_data_2020, aes(x=region, y=avg_score_2020)) + 
-  geom_bar(stat = "identity")+
-  coord_flip()
-```
-
- 
 ```{r world map plot}
 mapdata <- map_data("world") ##ggplot2
 #View(mapdata)
@@ -87,27 +89,37 @@ mapdata$region[mapdata$region == "USA"] <- "United States"
 mapdata$region[mapdata$region == "UK"] <- "United Kingdom"
 
 mapdata <- left_join(mapdata, avg_data_2020, by="region")
-#View(mapdata)
-
+mapdata <- left_join(mapdata, avg_data_2021, by="region")
 
 mapdata1<-mapdata %>% filter(!is.na(mapdata$avg_score_2020))
-#View(mapdata1)
+mapdata1<-mapdata %>% filter(!is.na(mapdata$avg_score_2021))
+
 
 map1<-ggplot(mapdata1, aes( x = long, y = lat, group=group)) +
   geom_polygon(aes(fill = avg_score_2020), color = "black")
 
+map2<-ggplot(mapdata1, aes( x = long, y = lat, group=group)) +
+  geom_polygon(aes(fill = avg_score_2021), color = "black")
 
-map2 <- map1 + scale_fill_gradient(name = "avg score", low = "light blue", high =  "black", na.value = "grey50")+
-  theme(axis.text.x = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks = element_blank(),
+map2
+
+library(viridis)
+
+map3 <- map1 + scale_fill_gradient(name = "avg score")+
+  theme(axis.title.y=element_blank(),
+        axis.title.x=element_blank(),
+        rect = element_blank()) +
+scale_fill_viridis()
+map3
+
+map4 <- map2 + scale_fill_gradient(name = "avg score")+
+  theme(axis.ticks = element_blank(),
         axis.title.y=element_blank(),
         axis.title.x=element_blank(),
-        rect = element_blank())
-map2
+        rect = element_blank())+
+scale_fill_viridis()
+map4
 ```
-
-
 
 
 ```{r loading gdp data}
