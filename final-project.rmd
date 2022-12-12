@@ -13,10 +13,6 @@ library(dplyr)
 library(lubridate)
 ```
 
-## Introduction
-
-
-
 
 ## Load Data
 
@@ -30,6 +26,7 @@ data_2021 <- read.csv("data/sentiment_country_2021.csv")
 view(data_2020)
 view(data_2021)
 ```
+
 
 ## Visualize Data
 
@@ -82,7 +79,6 @@ ggplot (data=monthly, aes(Month, Score, group = Year, color = Year))+
   theme_bw()
 
 
-
 ```
 
 
@@ -106,18 +102,24 @@ names(avg_data_2021)[names(avg_data_2021) == "NAME_0"] <- "region"
 ```
 
 
+
 ```{r range of scores 2020}
+
 ggplot(data = data_2020, aes(x=SCORE)) + 
   geom_histogram(binwidth = 0.01, fill = "lightblue")+ 
   ylab("Frequency") + 
   xlab("sentiment score") +
-  ggtitle("Distribution of Sentiment scores of the tweets")
+  ggtitle("Distribution of Sentiment scores of the tweets")+
+  theme_bw()
 
 ggplot(data = data_2021, aes(x=SCORE)) + 
   geom_histogram(binwidth = 0.01, fill = "lightblue")+ 
   ylab("Frequency") + 
   xlab("sentiment score") +
-  ggtitle("Distribution of Sentiment scores of the tweets")
+  ggtitle("Distribution of Sentiment scores of the tweets")+
+  scale_fill_viridis()+
+  theme_bw()
+
 ```
 
 ```{r world map plot}
@@ -208,7 +210,8 @@ data_total<-data_total %>% filter(!is.na(data_total$gdp))
 lgdp=log(data_total$gdp)
 ggplot(data = data_total, aes(x = lgdp , y = SCORE))+ 
   geom_point() + 
-  geom_smooth(method = "lm")
+  geom_smooth(method = "lm")+
+  theme_bw()
 
 attach(data_total)
 m1=lm(SCORE~gdp)
@@ -217,7 +220,7 @@ summary(m1)
 ```{r regression1 DAILY}
 
 library(brms)
-dv <- brm(formula = SCORE~gdp, data=data_total, family=gaussian ,refresh=0)
+dv <- brm(formula = SCORE~gdp, data=data_total, family=gaussian , refresh=0)
 
 ```
 
@@ -230,7 +233,8 @@ attach(data_total)
 uncertainty_coef<-as_draws_df(dv, variable = "b_gdp")
 ggplot(uncertainty_coef, aes(x=b_gdp))+geom_density()+labs(title= "Uncertainty in regression coefficient",
                                                                   x="Regression Coefficient",
-                                                                  y="Uncertainty")
+                                                                  y="Uncertainty")+
+  theme_bw()
 ```
 
 ```{r plot_effects1 DAILY}
@@ -258,7 +262,8 @@ df$users <- as.numeric(as.character(df$users))
 
 ggplot(data = df, aes(x = users , y = SCORE))+ 
   geom_point() + 
-  geom_smooth()
+  geom_smooth()+
+  theme_bw()
 
 ```
 
@@ -341,7 +346,8 @@ data_total$averageHours <- data_total$averageHours/1000
 
 ggplot(data = data_total, aes(x = averageHours , y = SCORE))+ 
   geom_point() + 
-  geom_smooth()
+  geom_smooth()+
+  theme_bw()
 
 ```
 ```{r regression5}
