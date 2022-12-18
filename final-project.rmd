@@ -22,14 +22,7 @@ data_2021 <- read.csv("data/sentiment_country_2021.csv")
 ```
 
 
-```{r viewing scores}
-view(data_2020)
-view(data_2021)
-```
-
-
 ## Visualize Data
-
 ```{r comparision 2020 and 2021}
 
 #2020
@@ -82,7 +75,7 @@ ggplot (data=monthly, aes(Month, Score, group = Year, color = Year))+
 ```
 
 
-```{r avg score 2020}
+```{r avg score 2020 & 2021}
 
 avg_data_2020<-data_2020 %>%
   group_by(NAME_0) %>%
@@ -103,7 +96,7 @@ names(avg_data_2021)[names(avg_data_2021) == "NAME_0"] <- "region"
 
 
 
-```{r range of scores 2020}
+```{r range of scores 2020 & 2021}
 
 ggplot(data = data_2020, aes(x=SCORE)) + 
   geom_histogram(binwidth = 0.01, fill = "lightblue")+ 
@@ -117,12 +110,11 @@ ggplot(data = data_2021, aes(x=SCORE)) +
   ylab("Frequency") + 
   xlab("sentiment score") +
   ggtitle("Distribution of Sentiment scores of the tweets")+
-  scale_fill_viridis()+
   theme_bw()
 
 ```
 
-```{r world map plot}
+```{r world map plot of sentiment scores}
 mapdata <- map_data("world") 
 
 #changing USA to United States
@@ -274,6 +266,10 @@ dv2 <- brm(formula = SCORE ~ users, data=df, family=gaussian ,refresh=0)
 
 ```
 
+```{r sum_model2}
+summary(dv2)
+```
+
 ```{r plot_reg_coefs2}
 draws_fit <- as_draws_df(dv2)
 posterior::summarize_draws(draws_fit)
@@ -295,16 +291,16 @@ conditional_effects(dv3)
 ```
 
 ```{r regression4}
-dv4 <- brm(formula = SCORE~gdp*users, data=df, family=gaussian ,refresh=0)
+#dv4 <- brm(formula = SCORE~gdp*users, data=df, family=gaussian ,refresh=0)
 ```
 
 ```{r plot_reg_coefs4}
-draws_fit <- as_draws_df(dv4)
-posterior::summarize_draws(draws_fit)
+#draws_fit <- as_draws_df(dv4)
+#posterior::summarize_draws(draws_fit)
 ```
 
 ```{r cond_eff_coefs4}
-conditional_effects(dv4)
+#conditional_effects(dv4)
 ```
 
 ```{r load and clean average hours}
@@ -318,7 +314,7 @@ average_hours <- average_hours[c(2,4,5)]
 names(average_hours)[names(average_hours) == "X.1"] <- "region"
 names(average_hours)[names(average_hours) == "X.74"] <- "averageHours"
 names(average_hours)[names(average_hours) == "X.75"] <- "averageHours"
-view(average_hours)
+#view(average_hours)
 
 avg20 <- average_hours[c(1,2)]
 avg21 <- average_hours[c(1,3)]
