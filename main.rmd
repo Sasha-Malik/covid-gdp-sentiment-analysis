@@ -1,0 +1,477 @@
+---
+title: "Analyzing the bidirectional dynamics between GDP growth and Public Sentiment during COVID-19"
+date: '2022-11-11'
+output: 
+  html_document:
+    theme: readable
+    highlights: tango
+    center: true
+    toc: true
+    toc_float: true
+    code_folding: hide
+    font-size: 12pt
+---
+
+
+# Introduction
+
+
+As technology evolves, social media platforms like Twitter have become global hubs, connecting people worldwide. Twitter stands out as a dynamic platform where discussions on pressing issues rapidly gain international attention. This platform is rich with user insights on political, social, and economic matters, offering a window into a nation's pulse. Beyond these serious topics, Twitter buzzes with brand announcements, trending memes, and content from influencers and creators, sparking diverse reactions and interactions.
+In our study, we examined sentiment data from various countries for 2020 and 2021, including daily sentiment scores, country names, and tweet volumes. These sentiment scores reflect the average positivity of tweets from each country on any given day. Our research aims to explore the correlation between public sentiment on Twitter and various factors such as Gross Domestic Product (GDP), Average Working Hours, and Internet Usage. To achieve this, we gathered relevant data from multiple sources, which we will detail in the Methods section. Utilizing visualization tools in R, we investigated how Twitter sentiments correlate with GDP growth and other variables.
+However, our study acknowledges potential biases in sentiment representation due to limitations in current sentiment analysis methodologies. For instance, the accuracy of language processing and text analysis systems is still a work in progress. This paper focuses on key terms such as Sentiment, Gross Domestic Product, Average Working Hours, and Internet Users. Section 2 provides a literature review of similar data science projects in sentiment analysis, delving into the theoretical framework of our project. Section 3 outlines the datasets and analytical methods we employed. In Section 4, we discuss our findings in the context of our theoretical framework, addressing the study's limitations. Section 5 proposes future research directions, acknowledging the study's constraints. Finally, in Section 6, we summarize our key findings and conclusions.
+
+
+# Literature Review
+
+
+The years 2020 and 2021, significantly shaped by the COVID-19 pandemic, necessitate analysis within this unique context. Existing literature reveals extensive social media usage during lockdowns for emotional sharing and relaxation, amidst widespread viral impact and global lockdowns. A notable study analyzed sentiments in tweets from twelve countries, specifically between March 11 and March 31, 2020, focusing on COVID-19-related content. This research aimed to understand varied national responses to the crisis. Following collection and preprocessing, these tweets underwent text mining and sentiment analysis. Results indicated a general global trend towards positivity, despite instances of fear, sadness, and anger. Notably, France, Switzerland, the Netherlands, and the USA exhibited more pronounced mistrust and anger, correlating with higher COVID-19 cases (Dubey, 2020).
+Another investigation highlighted the evolution of online behavior and sentiment during the pandemic. It analyzed 26 million English tweets from four countries and 14 major cities, using topic modeling across 23 subjects and monthly temporal and semantic analysis. The shift in public discourse from politics and sports to online shopping and the pandemic’s economic effects was evident, alongside an increase in emotional expressiveness over time (Alshamrani, 2021).
+A study examining sentiment analysis’s impact on economic indicators contrasted news media influence on the New York stock market index with gold and crude oil prices. It explored how sentiment analysis of news on global economic downturns due to events like terrorism or epidemics, including COVID-19, might predict stock market behaviors, offering insights for future research in this domain (Biswas, 2020).
+Addressing the “Easterlin Paradox”, a paper investigated the disconnect between economic growth and happiness. Analyzing American adults’ data from 1973 to 2004, it found that declining marital satisfaction and marriage rates contributed significantly to reduced happiness, independent of income trends. The study also noted recent alignment between financial satisfaction and real income increases, alongside positive perceptions of relative income and no substantial evidence of ‘overworking’ affecting happiness levels. It concluded that economic progress, combined with objective and subjective well-being behaviors, significantly influences happiness (Schnittker, 2008).
+Another study questioned the impact of economic growth on happiness in low-income countries. It examined the contentious relationship between wealth and subjective well-being, addressing theories on the minor impact of national economic growth on happiness due to factors like pollution, relative concerns, and adaptability. The research suggested that growth could indeed enhance happiness in low-income nations, considering the qualitative aspects of development and subjective well-being measures (Clark, 2010).
+Finally, a study on work hours and happiness used survey data to explore the impact of overtime on self-reported happiness, mental health, and economic satisfaction. It found that while overtime can lead to increased stress, fatigue, and work-family conflict, it also presents complex interactions with happiness and satisfaction levels, suggesting a nuanced approach to work hour policies for optimal social and economic well-being (Golden, 2006).
+
+
+# Hypothesis
+
+This study explores the commonly held belief that GDP growth correlates with increased positive public sentiment, reflecting the general view of GDP as a key indicator of a nation's economic health. An escalating GDP is often associated with enhanced confidence among investors and the general public, fostering a sense of financial security and prosperity. Conversely, a declining GDP can trigger uncertainty and financial insecurities, impacting investment behaviors and overall economic confidence. Furthermore, this relationship may be bidirectional. For instance, a pervasive low sentiment, possibly due to factors like a rising crime rate, might negatively influence workplace performance and business efficiency, potentially contributing to a GDP downturn. On the other hand, a robust GDP can embolden people to expand their businesses, realize profits, and attain financial independence, thus fostering a cycle of positive sentiment.
+Our research aims to test the hypothesis that an increase in GDP leads to more positive public sentiments. Through this investigation, we seek to determine the accuracy of this hypothesis, shedding light on the intricate dynamics between economic growth and societal mood.
+
+# Methods
+
+There are different methods of analyzing the data in a study. For analyzing the sentiment present on Twitter with other factors we are going to use a quantitative method for data collection. Quantitative methods involve dealing with numerical data which has statistical importance. The other method, the qualitative one, involves understanding the fundamentals of the behavior of data and gaining deeper insights into it. As we are going to use quantitative methods, we will be using the provided sentiment dataset as a source of data for gauging people’s emotions and feelings. Sentiment is an individual's state of mind that is determined by what the person is going through mentally, as well as their feelings and emotions. The circumstances in which a person finds themselves have a significant impact on their mood. Such circumstances can take both physical and mental forms. A person who has a positive or negative reaction to a specific event expresses their feelings through various mediums, such as their attitude, in several places. The Twitter data was collected from the Twitter Sentiment Geographical Index dataset which was done by the Sustainable Urbanization Lab at MIT and the Center for Geographic Analysis at Harvard collaboratively. The dataset contains average sentiment scores for each country daily. The specific data frames that we were provided with were CSV(Comma comma-separated values) files that had the date for observation, name of the country, states or provinces, number of posts generated on the given date, and a score that represented the sentiment of a country for that date as variables of interest. The sentiment score was a floating point number that measured the positivity in the tweets i.e. negative sentiment was represented by a sentiment score of 0 and positive sentiment was represented by 1. The CSV files that we were provided with had country data for the years 2020, and 2021 and municipal data for 2021 which additionally had scores for each state province or city along with the number of posts generated in each state for a given date. However, for the scope of our paper, we are only going to use the country data with sentiment scores for 2020 and 2021. We will only be analyzing sentiment scores versus another variable for countries in general rather than for each state. 
+
+The International Monetary Fund defines Gross Domestic Product as the monetary value of goods, and services that are produced within a specific country and bought by the final users in a given year. GDP is often seen as the representative indicator of a country’s economy and the ability of citizens to engage more in investing in businesses and trading. We obtained the data for Gross Domestic Product (GDP) for the years 2020 and 2021 for countries across the world through the World Bank. The CSV file contained data for countries represented by country code along with their GDP from the year 1960 to 2021. The GDP of interest for our group project was for the years 2020 and 2021 to compare them with sentiment scores and perform regression analysis with other variables.
+
+Similarly, we will be taking the average working hours of individuals in a country as a confounding variable as we suspect that it might both affect the sentiment of people and the GDP of a country. The dataset used to extract average working hours was found from the Total Economy Database-Data Central (TED) on The Conference Board website. It contained variables such as Employment rate, Per Capita Income, Population, Total Annual Hours, Labor Productivity, and many more along with the growth of such variables over time. 
+https://www.conference-board.org/data/economydatabase/total-economy-database-productivity
+
+The data for the number of internet users was obtained from the International Telecommunication Union. The dataset contained information about the number of internet users from the year 2000 to 2021. Since we are extracting every variable for the years 2020 and 2021 for the analysis, the same would be done for this dataset as well. 
+https://www.itu.int/en/ITU-D/Statistics/Pages/stat/default.aspx
+
+Data cleaning was performed to remove the unwanted columns and to extract only the desired variables from the dataset like GDP and Sentiment Score for instance from the data frames created above. In our case, the datasets contained nonnumerical values such as “...”, and “NA”, and spaces, missing values which had to be omitted to prevent errors during code compilation. Also, we noticed differences in naming styles for countries and acronyms used for particular countries. So data cleaning methods were used to maintain consistency and the main aim of it was to develop a standard approach throughout the data analysis process.
+
+At first, we will be visualizing the sentiment scores for 2020 and 2021 along with the month using line plots to see the trend of sentiment scores as time passes. Then, we will visualize the distribution of sentiment scores along with the frequency of tweets using a histogram plot. After that, we will show the variation of sentiment scores across countries all over the world with the Worldmap. To visualize the linear modeling of GDP with the average sentiment score for 2020 after merging the data, we will take the logarithm of GDP values to optimize the scale. Also, the outlier heavily affected the relationship so, it was omitted to see the plot of clustered data points more clearly. Also, regression analysis was performed between the number of internet users, the average working hours, and sentiment scores separately like the one done with sentiment score and GDP values above, to check the relationship between those variables. Finally, the data for the number of internet service users was combined with GDP to see their effect on the sentiment score.
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(lubridate)
+```
+
+
+```{r load_data}
+data_2020 <- read.csv("data/sentiment_country_2020.csv")
+data_2021 <- read.csv("data/sentiment_country_2021.csv")
+```
+
+
+```{r comparision 2020 and 2021}
+
+#2020
+
+data_2020$DATE=as.Date(data_2020$DATE)
+
+data_2020$Month <- months(data_2020$DATE)
+data_2020$Year <- format(data_2020$DATE,format="%y")
+
+data_2020<-data_2020 %>% filter(!is.na(data_2020$SCORE))
+
+monthly2020=data_2020 %>% 
+  group_by(Month,Year) %>% 
+  summarise_at(vars(SCORE),
+               list(Score=mean))
+
+monthly2020$Month=factor(monthly2020$Month, levels = month.name)
+
+
+#2021
+
+data_2021$DATE=as.Date(data_2021$DATE)
+
+data_2021$Month <- months(data_2021$DATE)
+data_2021$Year <- format(data_2021$DATE,format="%y")
+
+data_2021<-data_2021 %>% filter(!is.na(data_2021$SCORE))
+
+monthly2021=data_2021 %>% 
+  group_by(Month,Year) %>% 
+  summarise_at(vars(SCORE),
+               list(Score=mean))
+
+monthly2021$Month=factor(monthly2021$Month, levels = month.name)
+
+
+
+monthly <- rbind(monthly2020,monthly2021)
+
+
+monthly$Year[monthly$Year == "20"] <- "2020"
+monthly$Year[monthly$Year == "21"] <- "2021"
+
+ggplot (data=monthly, aes(Month, Score, group = Year, color = Year))+
+  geom_point()+geom_line()+
+  ggtitle("Comparision of Sentiment Scores in 2020 & 2021")+
+  theme_bw()
+
+
+```
+
+
+```{r avg score 2020 & 2021}
+
+avg_data_2020<-data_2020 %>%
+  group_by(NAME_0) %>%
+  summarize(
+    avg_score_2020 = mean(SCORE, na.rm = TRUE)
+    )
+
+avg_data_2021<-data_2021 %>%
+  group_by(NAME_0) %>%
+  summarize(
+    avg_score_2021 = mean(SCORE, na.rm = TRUE)
+    )
+
+names(avg_data_2020)[names(avg_data_2020) == "NAME_0"] <- "region"
+names(avg_data_2021)[names(avg_data_2021) == "NAME_0"] <- "region"
+
+```
+
+
+
+```{r range of scores 2020 & 2021}
+
+ggplot(data = data_2020, aes(x=SCORE)) + 
+  geom_histogram(binwidth = 0.01, fill = "lightblue")+ 
+  ylab("Frequency") + 
+  xlab("sentiment score") +
+  ggtitle("Distribution of Sentiment scores of the tweets in 2020")+
+  theme_bw()
+
+ggplot(data = data_2021, aes(x=SCORE)) + 
+  geom_histogram(binwidth = 0.01, fill = "lightblue")+ 
+  ylab("Frequency") + 
+  xlab("sentiment score") +
+  ggtitle("Distribution of Sentiment scores of the tweets in 2021")+
+  theme_bw()
+
+```
+
+```{r world map plot of sentiment scores, message=FALSE}
+mapdata <- map_data("world") 
+
+#changing USA to United States
+mapdata$region[mapdata$region == "USA"] <- "United States"
+
+#changing UK to United Kingdom
+mapdata$region[mapdata$region == "UK"] <- "United Kingdom"
+
+mapdata <- left_join(mapdata, avg_data_2020, by="region")
+mapdata <- left_join(mapdata, avg_data_2021, by="region")
+
+mapdata1<-mapdata %>% filter(!is.na(mapdata$avg_score_2020))
+mapdata1<-mapdata %>% filter(!is.na(mapdata$avg_score_2021))
+
+
+map1<-ggplot(mapdata1, aes( x = long, y = lat, group=group)) +
+  geom_polygon(aes(fill = avg_score_2020), color = "black")
+
+map2<-ggplot(mapdata1, aes( x = long, y = lat, group=group)) +
+  geom_polygon(aes(fill = avg_score_2021), color = "black")
+
+library(viridis)
+
+map1 <- map1 + scale_fill_gradient(name = "avg score")+
+  ggtitle("Average sentiment scores in 2020")+
+  theme(plot.title = element_text(size = 20),
+        axis.title.y=element_blank(),
+        axis.title.x=element_blank(),
+        rect = element_blank()) +
+scale_fill_viridis()
+map1
+
+map2 <- map2 + scale_fill_gradient(name = "avg score")+
+  ggtitle("Average sentiment scores in 2021")+
+  theme( plot.title = element_text(size = 20),
+        axis.ticks = element_blank(),
+        axis.title.y=element_blank(),
+        axis.title.x=element_blank(),
+        rect = element_blank())+
+scale_fill_viridis()
+  
+map2
+```
+
+
+```{r loading GDP data,warning = FALSE,message = FALSE}
+
+gdp_2020 <- read_csv("gdp_2020.csv")
+
+gdp_2021 <- read_csv("gdp_2021.csv")
+
+gdp_2020 <- gdp_2020[c(1,5)]
+gdp_2021 <- gdp_2021[c(1,5)]
+
+names(gdp_2020)[names(gdp_2020) == "Country Name"] <- "region"
+names(gdp_2021)[names(gdp_2021) == "Country Name"] <- "region"
+
+names(gdp_2020)[names(gdp_2020) == "2020 [YR2020]"] <- "gdp"
+names(gdp_2021)[names(gdp_2021) == "2021 [YR2021]"] <- "gdp"
+
+
+names(data_2020)[names(data_2020) == "NAME_0"] <- "region"
+names(data_2021)[names(data_2021) == "NAME_0"] <- "region"
+
+data_2020 <- left_join(data_2020, gdp_2020, by="region")
+data_2021 <- left_join(data_2021, gdp_2021, by="region")
+
+data_total <- rbind(data_2020,data_2021)
+
+sentiment_data <- data_total
+
+```
+
+
+
+
+```{r comparing scores & gdp,warning = FALSE,message = FALSE}
+
+#removing missing values
+data_total<-data_total[!(data_total$gdp==".."),]
+
+data_total$gdp <- as.numeric(as.character(data_total$gdp))
+
+data_total$gdp = (data_total$gdp) / 10000000000000
+
+data_total<-data_total %>% filter(!is.na(data_total$gdp))
+
+#taking log of gdp
+lgdp=log(data_total$gdp)
+
+ggplot(data = data_total, aes(x = lgdp , y = SCORE))+ 
+  geom_point(alpha = 0.3) + 
+  geom_smooth(method = "lm")+
+  ggtitle("Relationship : Sentiment Scores & GDP")+
+  xlab("GDP")+
+  ylab("Sentiment Scores")+
+  theme_bw()
+
+attach(data_total)
+m1=lm(SCORE~gdp)
+summary(m1)
+```
+```{r regression1 GDP, warning = FALSE, message = FALSE}
+
+library(brms)
+dv <- brm(formula = SCORE~gdp, data=data_total, family=gaussian , refresh=0, verbose=FALSE)
+
+```
+
+```{r sum_model1, warning = FALSE, message = FALSE}
+summary(dv)
+```
+
+```{r plot_uncertainty_coef1,warning = FALSE,message = FALSE}
+attach(data_total)
+uncertainty_coef<-as_draws_df(dv, variable = "b_gdp")
+ggplot(uncertainty_coef, aes(x=b_gdp))+
+  geom_density()+
+  labs(title= "Uncertainty in regression coefficient",x="Regression Coefficient",y="Uncertainty")+
+  theme_bw()
+```
+
+```{r plot_effects1, include = FALSE,warning = FALSE,message = FALSE}
+plot1 <- plot(conditional_effects(dv,effects="gdp"))
+ 
+```
+
+```{r warning = FALSE,message = FALSE}
+plot1 <- plot1[[1]] 
+
+plot1 <- plot1 +
+  labs(x = "GDP", y = "Sentiment Sores")+
+  ggtitle("Regression : Sentiment Scores & GDP") + 
+  theme_bw()
+
+plot1
+```
+
+
+
+```{r loading and cleaning internet users,warning = FALSE,message = FALSE}
+internet_users <- read.csv("internet_users.csv")
+
+internet_users <- internet_users[c(2,3)]
+
+internet_users<-internet_users %>% filter(!is.na(internet_users$X.1))
+
+internet_users<-internet_users %>%  filter(!row_number() %in% c(1, 2, 3, 4))
+
+names(internet_users)[names(internet_users) == "X.1"] <- "region"
+names(internet_users)[names(internet_users) == "X.2"] <- "users"
+
+df<-left_join(internet_users,data_total, by="region")
+
+df<-df %>% filter(!is.na(df$SCORE))
+
+df$users <- as.numeric(as.character(df$users))
+
+```
+
+```{r comparing score and internet users,warning = FALSE,message = FALSE}
+ggplot(data = df, aes(x = users , y = SCORE))+ 
+  geom_point() + 
+  geom_smooth()+
+  ggtitle("Relationship : Sentiment Scores & Internet Users")+
+  xlab("Internet Users")+
+  ylab("Sentiment Scores")+
+  theme_bw()
+```
+
+
+
+```{r regression2 gdp + users,warning = FALSE,message = FALSE}
+dv2 <- brm(formula = SCORE~gdp+users, data=df, family=gaussian ,refresh=0)
+```
+
+
+
+
+```{r plot_reg_coefs2,warning = FALSE,message = FALSE}
+draws_fit <- as_draws_df(dv2)
+posterior::summarize_draws(draws_fit)
+```
+
+```{r sum_model2,warning = FALSE,message = FALSE}
+summary(dv2)
+```
+```{r plot_uncertainty_coef2,warning = FALSE,message = FALSE}
+attach(df)
+uncertainty_coef<-as_draws_df(dv2, variable = "b_users")
+ggplot(uncertainty_coef, aes(x=b_users))+
+  geom_density()+
+  labs(title= "Uncertainty in regression coefficient",x="Regression Coefficient",y="Uncertainty")+
+  theme_bw()
+```
+
+```{r cond_eff_coefs2, include = FALSE,warning = FALSE,message = FALSE}
+plot2 <- plot(conditional_effects(dv2))
+```
+
+```{r warning = FALSE,message = FALSE}
+plot2 <- plot2[[1]] 
+
+plot2 <- plot2 +
+  labs(x = "GDP + Internet Users", y = "Sentiment Sores")+
+  ggtitle("Regression : Sentiment Scores & GDP + Internet Users") + 
+  theme_bw()
+
+plot2
+```
+
+
+```{r load and clean average hours worked,warning = FALSE,message = FALSE}
+average_hours <- read.csv("average_hours.csv")
+
+average_hours <- average_hours[c(1,3,4,76,77)]
+average_hours<-average_hours %>%  filter(!row_number() %in% c(1, 2, 3))
+average_hours <- dplyr::filter(average_hours, X.2 %in% c("Average Hours Worked"))
+average_hours <- average_hours[c(2,4,5)]
+names(average_hours)[names(average_hours) == "X.1"] <- "region"
+names(average_hours)[names(average_hours) == "X.74"] <- "averageHours"
+names(average_hours)[names(average_hours) == "X.75"] <- "averageHours"
+#view(average_hours)
+
+avg20 <- average_hours[c(1,2)]
+avg21 <- average_hours[c(1,3)]
+
+avg20['Year'] = '20'
+avg21['Year'] = '21'
+
+```
+
+```{r comparing avg hours worked and sentiment scores,warning = FALSE,message = FALSE}
+
+avg_20 <- dplyr::filter(df, Year %in% c("20"))
+avg_21 <- dplyr::filter(df, Year %in% c("21"))
+
+avg_20 <- left_join(avg_20, avg20, by=c("region","Year"))
+avg_21 <- left_join(avg_21, avg21, by=c("region","Year"))
+
+data_total <- rbind(avg_20,avg_21)
+
+data_total<- data_total %>% filter(!is.na(data_total$averageHours))
+
+data_total$averageHours <- as.numeric(gsub(",","",data_total$averageHours))
+
+data_total$averageHours <- data_total$averageHours/1000
+
+ggplot(data = data_total, aes(x = averageHours , y = SCORE))+ 
+  geom_point() + 
+  geom_smooth()+
+  ggtitle("Relationship : Sentiment Scores & Average Hours Worked")+
+  xlab("Average Hours Worked")+
+  ylab("Sentiment Scores")+
+  theme_bw()
+
+```
+
+
+```{r regression3,warning = FALSE,message = FALSE}
+dv3 <- brm(formula = SCORE~gdp + users + averageHours, data=data_total, family=gaussian ,refresh=0)
+```
+
+```{r plot_reg_coefs3,warning = FALSE,message = FALSE}
+draws_fit <- as_draws_df(dv3)
+posterior::summarize_draws(draws_fit)
+```
+
+```{r sum_model3,warning = FALSE,message = FALSE}
+summary(dv3)
+```
+
+```{r cond_eff_coef3, include=FALSE,warning = FALSE,message = FALSE}
+plot3 <- plot(conditional_effects(dv3))
+```
+
+```{r warning = FALSE,message = FALSE}
+plot3 <- plot3[[2]] 
+
+plot3 <- plot3 +
+  labs(x = "GDP + Internet Users + Average Hours Worked", y = "Sentiment Sores")+
+  ggtitle("Regression : Sentiment Scores & GDP + Internet Users + Avergae Hours Worked") + 
+  theme_bw()
+
+plot3
+```
+
+# Result Discussion  
+
+We notice that there is a downward trend in GDP with the average of sentiment scores that is consistent with our findings meaning that higher income does not necessarily translate into higher satisfaction. The same is true for work hours as there seems to be a negative relationship between average hours worked per week with sentiment scores. Regressing the logarithmic value of GDP against the average of the sentiment scores does not lead to conclusive results with coefficients of 0.01 and a standard error of 0.0006. 
+
+GDP was scaled down to 10^13. Average working hours were scaled down to 10^3.  The coefficient is -0.1 for score per 10*12 power of the value of GDP.  The sentiment score increases by 0.105 for every additional 5^10 working hours, uncertainty in the regression coefficient is in between -0.0012 and -0.0010 with a normal distribution.  
+
+The results are consistent with past literature and could be explained by the compromises made to interpersonal relationships when earning higher incomes and working longer hours. Since we suspected internet use might be a confounding variable, we added that variable to our regression of sentiment scores and GDP and it shifted the sentiment score trend upwards with a coefficient of 0.02 for GDP and an intercept of 0.61. Therefore, we can infer that there is a relationship between internet usage, GDP, and average sentiment scores, with internet usage driving sentiment scores higher across different GDP levels. 
+
+
+# Limitations
+
+A major limitation in the great majority of research literature on sentiment analysis is the almost exclusive focus on social media data in the English language. Therefore, it is necessary to close this research gap by creating efficient analytic methods and procedures for sentiment analysis of data in non-English languages. To better understand attitudes and handle issues involving people, especially in a multilingual society, these analyses of non-English language data should be combined with the study of data in English. Another difficulty in today's sentiment analysis is creating a high-accuracy approach that does not require the customization of training datasets.
+
+Another limitation of our research is the use of GDP variables. Gross domestic product (GDP), which ignores nonmarket activities and environmental conditions, is a measure of a nation's market economic activity, or total market output. GDP is a "neutral" metric since it doesn't differentiate between good and bad economic activity; rather, it just measures the market worth of all current domestic production. Given the foregoing, why is GDP regarded as the most important gauge of the state of the economy? GDP does a good job of measuring what it is supposed to. It focuses primarily on the aspects of the economy that can be measured and seen, such as what is purchased (consumption and investment) and what is spent (government). However, it falls short of an exhaustive assessment of a nation's total level of social, economic, and environmental health. Welfare and human well-being are not included in GDP. Additionally, when there is a lot of uncertainty, GDP may not be a good indicator of future economic growth. GDP takes a while to reflect changes in the world because international accounting rules are slow to change and need international agreement.
+GDP ignores non-market activities, including the production of human capital in that industry. GDP ignores non-market activities, including the production of human capital in that industry. The GDP does not incorporate significant indicators like ecosystems, pollution, climate change, or green GDP accounts, measurements of happiness, sustainability, inequality, or nonmarket accounts.
+
+Since not everyone is present on Twitter, the sentiment scores do not exactly tell whether having a greater GDP means people are more happy. Most of the users on Twitter are between the ages of 25 and 34. So, it does not accurately represent the sentiment of the rest of the age groups which are not present on the platform. There are restrictions to access Twitter in some of the countries as well. The sentiment of users is also affected by other factors such as a particular incident, for instance, the murder of George Flyod, where Twitter was filled with words of the public that had negative sentiment. Such things that account for the sentiment score of a region or country are not related to the GDP but we cannot perform the analysis by excluding the sentiment of people related to specific events. Discussion about the latest trends and memes also count for a large amount of tweets which are in no way related to the GDP of the country will ultimately affect the overall sentiment. Also, the natural language processing system used in analyzing the sentiment score might not always have accuracy in comprehending the usual day-to-day way of speaking, slang, and satires, and detect ambiguity with formal forms of writing of languages.
+
+The study presented demonstrates that although working hours data can have limits owing to variations in the sources or the implementation of the method, how much these depend on the context for our interpretation of the data. Here, it's crucial to compare similar nations precisely because minute variations in the sources might have a big impact. This is why, to maximize cross-country comparability, only labor force surveys were utilized to compare current working hours levels in the US and Europe. However, as a trade-off, there was a limited number of wealthy nations that could be examined. Since we concentrate on a smaller period, including short-term historical patterns, the sources' shortcomings can seriously affect our findings.
+
+
+# Further Research
+
+Further research can be done by analyzing literacy rates, crime rate, poverty index, COVID death cases, and employment rate in a country to find its relation to Gross Domestic Product. GDP does not exactly represent the well-being of the country. Well-being is related to the sentiment of people. The well-being of an individual can be represented by the quality of the index of a country. Well-being is also characterized by average life expectancy, poverty index, and literacy rates. These indicators are also related to the sentiment of people as well as the GDP of the country. The more people are educated, live a healthier lifestyle, and have financial literacy, it will improve the living standard of the country’s residents which might also imply that the country has higher GDP. Furthermore, during COVID times the economy of countries was greatly affected by the pandemic so, the effect of covid on GDP along with the sentiment could be observed by taking the number of COVID cases as a confounding variable.
+
