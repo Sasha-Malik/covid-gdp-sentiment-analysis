@@ -1,3 +1,3 @@
-# Final Project for Data and Society
+# Analyzing the bidirectional dynamics between GDP growth and Public Sentiment during COVID-19
 
-This is the repository you will use to submit your final project for this class as a team. The `data` folder contains two CSV files that you can use to do your analyses. `sentiment_country_2020.csv` and `sentiment_country_2021.csv` are daily sentiment (positive/negative mood) for each country per day for each year. `sentiment_municipal_2021.csv` contains municipal (city-level) daily sentiment scores for 2021. You can use both or either of these datasets. To learn more about how the data were constructed, see https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/3IL00Q. 
+Data : https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/3IL00Q. 
